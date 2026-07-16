@@ -1,25 +1,27 @@
 .dashboard {
   display: flex;
   min-height: 100vh;
+  background: #f1f5f9;
 }
 
 .content {
   margin-left: 250px;
   padding: 40px;
-  flex: 1;
-  background: #f8fafc;
+  width: 100%;
 }
 
 .content h1 {
   color: #0f172a;
 }
 
-.content h2 {
-  color: #475569;
-  margin-top: 10px;
+.subtitle {
+  color: #64748b;
+  margin-bottom: 40px;
+  font-size: 18px;
 }
 
-.content p {
-  margin-top: 20px;
-  line-height: 1.8;
+.card-container {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
 }
