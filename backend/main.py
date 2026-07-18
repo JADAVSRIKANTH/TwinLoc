@@ -1,5 +1,8 @@
+from api.generator import router as generator_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from api.health import router as health_router
 
 app = FastAPI(
     title="TwinLoc API",
@@ -7,7 +10,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow React frontend to access FastAPI
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -19,15 +22,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def root():
-    return {
-        "message": "Welcome to TwinLoc 🚀"
-    }
-
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy",
-        "backend": "running"
-    }
+# Register API routers
+app.include_router(health_router)
+app.include_router(generator_router)

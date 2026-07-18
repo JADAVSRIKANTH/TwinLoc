@@ -7,6 +7,8 @@ import {
   FaCog,
 } from "react-icons/fa";
 
+import { Link } from "react-router-dom";
+
 import "./Sidebar.css";
 
 function Sidebar() {
@@ -15,13 +17,42 @@ function Sidebar() {
       <h2 className="logo">TwinLoc</h2>
 
       <ul>
-        <li><FaHome /> Dashboard</li>
-        <li><FaProjectDiagram /> WSN Generator</li>
-        <li><FaPlayCircle /> Simulation</li>
-        <li><FaChartBar /> Analytics</li>
-        <li><FaFileAlt /> Reports</li>
-        <li><FaCog /> Settings</li>
-      </ul>
+  <li>
+    <Link to="/">
+      <FaHome /> Dashboard
+    </Link>
+  </li>
+
+  <li>
+    <Link to="/generator">
+      <FaProjectDiagram /> WSN Generator
+    </Link>
+  </li>
+
+  <li>
+    <Link to="/simulation">
+      <FaPlayCircle /> Simulation
+    </Link>
+  </li>
+
+  <li>
+    <Link to="/analytics">
+      <FaChartBar /> Analytics
+    </Link>
+  </li>
+
+  <li>
+    <Link to="/reports">
+      <FaFileAlt /> Reports
+    </Link>
+  </li>
+
+  <li>
+    <Link to="/settings">
+      <FaCog /> Settings
+    </Link>
+  </li>
+</ul>
     </aside>
   );
 }

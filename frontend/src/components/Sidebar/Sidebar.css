@@ -34,3 +34,15 @@
 .sidebar li:hover {
   background: #1e293b;
 }
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.sidebar a:hover {
+    color: #38bdf8;
+}
