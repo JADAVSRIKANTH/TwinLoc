@@ -1,4 +1,5 @@
 import random
+import math
 
 
 def generate_random_network(request):
@@ -23,6 +24,26 @@ def generate_random_network(request):
             "y": round(random.uniform(0, request.network_height), 2)
         })
 
+    # Generate measured distances from each sensor to nearby anchors
+    measured_distances = {}
+
+    for sensor in sensor_nodes:
+
+        sensor_measurements = {}
+
+        for anchor in anchor_nodes:
+
+            distance = math.sqrt(
+                (sensor["x"] - anchor["x"]) ** 2 +
+                (sensor["y"] - anchor["y"]) ** 2
+            )
+
+            # Store only anchors within communication range
+            if distance <= request.communication_range:
+                sensor_measurements[anchor["id"]] = round(distance, 2)
+
+        measured_distances[sensor["id"]] = sensor_measurements
+
     return {
         "network_width": request.network_width,
         "network_height": request.network_height,
@@ -31,9 +52,12 @@ def generate_random_network(request):
         "sensor_nodes": sensor_nodes,
         "anchor_nodes": anchor_nodes,
 
+        # NEW
+        "measured_distances": measured_distances,
+
         "statistics": {
-            "total_nodes": request.sensor_nodes,
+            "sensor_nodes": request.sensor_nodes,
             "anchor_nodes": request.anchor_nodes,
-            "unknown_nodes": request.sensor_nodes - request.anchor_nodes
+            "total_nodes": request.sensor_nodes + request.anchor_nodes
         }
     }

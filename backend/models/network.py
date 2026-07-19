@@ -10,3 +10,4 @@ class NetworkRequest(BaseModel):
     deployment: str
     algorithm: str
     seed: int
+    max_iterations: int = 100

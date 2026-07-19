@@ -1,5 +1,6 @@
 from api.generator import router as generator_router
 from fastapi import FastAPI
+from api.localization import router as localization_router
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.health import router as health_router
@@ -21,7 +22,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # Register API routers
 app.include_router(health_router)
 app.include_router(generator_router)
+app.include_router(localization_router)
