@@ -4,70 +4,108 @@ import matplotlib.pyplot as plt
 class NetworkPlot:
 
     @staticmethod
-    def plot(
+    def plot_network(
         network,
-        estimated_positions=None,
-        save_path=None,
+        estimated_positions,
+        algorithm_name,
+        save_path,
     ):
+        """
+        Visualize the WSN localization result.
 
-        plt.figure(figsize=(8,8))
+        Parameters
+        ----------
+        network : dict
+            Generated network.
 
-        # Sensor Nodes
-        sx = [s["x"] for s in network["sensor_nodes"]]
-        sy = [s["y"] for s in network["sensor_nodes"]]
+        estimated_positions : dict
+            algorithm_result["best_position"]
 
-        plt.scatter(
-            sx,
-            sy,
-            label="Sensor Nodes",
-            marker="o",
-        )
+        algorithm_name : str
 
+        save_path : str
+        """
+
+        plt.figure(figsize=(8, 8))
+
+        # -------------------------------
         # Anchor Nodes
-        ax = [a["x"] for a in network["anchor_nodes"]]
-        ay = [a["y"] for a in network["anchor_nodes"]]
+        # -------------------------------
+        anchor_x = [a["x"] for a in network["anchor_nodes"]]
+        anchor_y = [a["y"] for a in network["anchor_nodes"]]
 
         plt.scatter(
-            ax,
-            ay,
+            anchor_x,
+            anchor_y,
+            marker="s",
+            s=120,
+            color="blue",
             label="Anchor Nodes",
-            marker="^",
-            s=100,
         )
 
+        # -------------------------------
+        # True Sensor Nodes
+        # -------------------------------
+        sensor_x = [s["x"] for s in network["sensor_nodes"]]
+        sensor_y = [s["y"] for s in network["sensor_nodes"]]
+
+        plt.scatter(
+            sensor_x,
+            sensor_y,
+            marker="o",
+            s=40,
+            color="green",
+            label="True Position",
+        )
+
+        # -------------------------------
         # Estimated Positions
-        if estimated_positions:
+        # -------------------------------
+        est_x = []
+        est_y = []
 
-            ex = [
-                estimated_positions[k]["x"]
-                for k in estimated_positions
-            ]
+        for sensor in network["sensor_nodes"]:
 
-            ey = [
-                estimated_positions[k]["y"]
-                for k in estimated_positions
-            ]
+            sid = sensor["id"]
 
-            plt.scatter(
-                ex,
-                ey,
-                marker="x",
-                label="Estimated",
+            if sid not in estimated_positions:
+                continue
+
+            estimate = estimated_positions[sid]
+
+            est_x.append(estimate["x"])
+            est_y.append(estimate["y"])
+
+            # Error Line
+            plt.plot(
+                [sensor["x"], estimate["x"]],
+                [sensor["y"], estimate["y"]],
+                linestyle="--",
+                linewidth=0.8,
+                color="gray",
             )
 
-        plt.legend()
+        plt.scatter(
+            est_x,
+            est_y,
+            marker="x",
+            s=60,
+            color="red",
+            label="Estimated Position",
+        )
 
-        plt.xlabel("X")
+        plt.title(f"{algorithm_name} Network Localization")
 
-        plt.ylabel("Y")
-
-        plt.title("Wireless Sensor Network")
+        plt.xlabel("X Coordinate (m)")
+        plt.ylabel("Y Coordinate (m)")
 
         plt.grid(True)
+        plt.legend()
 
-        if save_path:
-            plt.savefig(save_path,dpi=300)
+        plt.axis("equal")
 
-        plt.show()
+        plt.tight_layout()
+
+        plt.savefig(save_path, dpi=300)
 
         plt.close()

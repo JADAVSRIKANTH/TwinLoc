@@ -13,7 +13,16 @@ from algorithms.factory import AlgorithmFactory
 from analytics.evaluator import evaluate_localization
 from models.network import NetworkRequest
 from visualization.plots import PlotGenerator
+from visualization.network_plot import NetworkPlot
 
+# Reports directory
+reports_dir = os.path.join(
+    os.path.dirname(__file__),
+    "..",
+    "reports",
+)
+
+os.makedirs(reports_dir, exist_ok=True)
 
 def run_algorithm(network, request, algorithm_name):
     """
@@ -43,6 +52,23 @@ def run_algorithm(network, request, algorithm_name):
     )
 
     result = algorithm.run()
+    display_name = {
+        "MFO": "mfo",
+        "GA": "ga",
+        "Hybrid_MFO_GA": "hybrid"
+    }
+
+    image_path = os.path.join(
+        reports_dir,
+        f"{display_name[algorithm_name]}_network.png"
+    )
+
+    NetworkPlot.plot_network(
+        network=network,
+        estimated_positions=result["best_position"],
+        algorithm_name=result["algorithm"],
+        save_path=image_path,
+    )
 
     analytics = evaluate_localization(
         true_positions=true_positions,
@@ -155,14 +181,6 @@ def main():
         for algo in algorithms
     }
 
-    reports_dir = os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "reports"
-    )
-
-    os.makedirs(reports_dir, exist_ok=True)
-
     convergence_path = os.path.join(
         reports_dir,
         "convergence_comparison.png"
@@ -216,7 +234,20 @@ def main():
     print("Experiment Completed Successfully!")
     print("=" * 60)
 
-    print(f"\nConvergence graph saved to:\n{convergence_path}")
+    print("\nGenerated Reports")
+    print("--------------------------------------")
+
+    print("✓ convergence_comparison.png")
+    print("✓ mle_comparison.png")
+    print("✓ rmse_comparison.png")
+    print("✓ nle_comparison.png")
+    print("✓ success_rate_comparison.png")
+
+    print("✓ mfo_network.png")
+    print("✓ ga_network.png")
+    print("✓ hybrid_network.png")
+
+    print("--------------------------------------")
 
 
 if __name__ == "__main__":
