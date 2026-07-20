@@ -100,7 +100,9 @@ class NetworkPlot:
         plt.ylabel("Y Coordinate (m)")
 
         plt.grid(True)
-        plt.legend()
+        plt.legend(
+        loc="upper left",
+        bbox_to_anchor=(1.02, 1),)
 
         plt.axis("equal")
 

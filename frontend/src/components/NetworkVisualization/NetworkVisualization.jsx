@@ -10,21 +10,21 @@ function NetworkVisualization({ network }) {
     );
   }
 
-  const width = 700;
-  const height = 500;
+  const WIDTH = 900;
+  const HEIGHT = 550;
 
-  // Network dimensions received from backend
   const networkWidth = network.network_width;
   const networkHeight = network.network_height;
   const communicationRange = network.communication_range;
 
-  // Combine all nodes
-  const allNodes = [
-    ...network.sensor_nodes,
-    ...network.anchor_nodes,
-  ];
+  const sensorNodes = network.sensor_nodes;
+  const anchorNodesList = network.anchor_nodes;
 
-  // Calculate communication links
+  const allNodes = [...sensorNodes, ...anchorNodesList];
+
+  // -----------------------------
+  // Calculate Communication Links
+  // -----------------------------
   const connections = [];
 
   for (let i = 0; i < allNodes.length; i++) {
@@ -43,62 +43,151 @@ function NetworkVisualization({ network }) {
     }
   }
 
-  console.log("Connections:", connections.length);
+  // -----------------------------
+  // Statistics
+  // -----------------------------
+  const totalNodes = network.statistics.total_nodes;
+  const anchorNodes = network.statistics.anchor_nodes;
+  const unknownNodes = totalNodes - anchorNodes;
 
   return (
     <div className="network-container">
+
       <h2>Network Visualization</h2>
 
+      {/* ================= Legend ================= */}
+
+      <div className="network-legend">
+
+        <div className="legend-item">
+          <span className="legend sensor"></span>
+          Sensor Node
+        </div>
+
+        <div className="legend-item">
+          <span className="legend anchor"></span>
+          Anchor Node
+        </div>
+
+        <div className="legend-item">
+          <span className="legend link"></span>
+          Communication Link
+        </div>
+
+      </div>
+
+      {/* ================= SVG ================= */}
+
       <svg
-        width={width}
-        height={height}
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        width="100%"
+        height="auto"
         className="network-canvas"
+        style={{
+          background: "#f8fafc",
+          borderRadius: "12px",
+        }}
       >
         {/* Communication Links */}
+
         {connections.map((connection, index) => (
+
           <line
             key={index}
-            x1={connection.from.x * (width / networkWidth)}
-            y1={height - connection.from.y * (height / networkHeight)}
-            x2={connection.to.x * (width / networkWidth)}
-            y2={height - connection.to.y * (height / networkHeight)}
-            stroke="#9ca3af"
+            x1={connection.from.x * (WIDTH / networkWidth)}
+            y1={HEIGHT - connection.from.y * (HEIGHT / networkHeight)}
+            x2={connection.to.x * (WIDTH / networkWidth)}
+            y2={HEIGHT - connection.to.y * (HEIGHT / networkHeight)}
+            stroke="#94a3b8"
+            strokeOpacity="0.55"
             strokeWidth="1"
           />
+
         ))}
 
         {/* Sensor Nodes */}
-        {network.sensor_nodes.map((node) => (
+
+        {sensorNodes.map((node) => (
+
           <circle
             key={`S-${node.id}`}
-            cx={node.x * (width / networkWidth)}
-            cy={height - node.y * (height / networkHeight)}
-            r="4"
+            cx={node.x * (WIDTH / networkWidth)}
+            cy={HEIGHT - node.y * (HEIGHT / networkHeight)}
+            r="5"
             fill="#2563eb"
-          />
+          >
+            <title>
+              {`Sensor Node
+
+ID : ${node.id}
+
+X : ${node.x.toFixed(2)}
+
+Y : ${node.y.toFixed(2)}`}
+            </title>
+          </circle>
+
         ))}
 
         {/* Anchor Nodes */}
-        {network.anchor_nodes.map((node) => (
+
+        {anchorNodesList.map((node) => (
+
           <polygon
             key={`A-${node.id}`}
             points={`
-              ${node.x * (width / networkWidth)},${height - node.y * (height / networkHeight) - 6}
-              ${node.x * (width / networkWidth) - 6},${height - node.y * (height / networkHeight) + 6}
-              ${node.x * (width / networkWidth) + 6},${height - node.y * (height / networkHeight) + 6}
+              ${node.x * (WIDTH / networkWidth)},${HEIGHT - node.y * (HEIGHT / networkHeight) - 7}
+              ${node.x * (WIDTH / networkWidth) - 7},${HEIGHT - node.y * (HEIGHT / networkHeight) + 7}
+              ${node.x * (WIDTH / networkWidth) + 7},${HEIGHT - node.y * (HEIGHT / networkHeight) + 7}
             `}
             fill="#dc2626"
-          />
+          >
+            <title>
+              {`Anchor Node
+
+ID : ${node.id}
+
+X : ${node.x.toFixed(2)}
+
+Y : ${node.y.toFixed(2)}`}
+            </title>
+          </polygon>
+
         ))}
+
       </svg>
 
-      <div className="network-info">
-        <p><strong>Total Nodes:</strong> {network.statistics.total_nodes}</p>
-        <p><strong>Anchor Nodes:</strong> {network.statistics.anchor_nodes}</p>
-        <p><strong>Unknown Nodes:</strong> {network.statistics.unknown_nodes}</p>
-        <p><strong>Communication Range:</strong> {communicationRange} m</p>
-        <p><strong>Communication Links:</strong> {connections.length}</p>
+      {/* ================= Statistics ================= */}
+
+      <div className="network-stats">
+
+        <div className="stat-box">
+          <h4>Total Nodes</h4>
+          <h2>{totalNodes}</h2>
+        </div>
+
+        <div className="stat-box">
+          <h4>Anchor Nodes</h4>
+          <h2>{anchorNodes}</h2>
+        </div>
+
+        <div className="stat-box">
+          <h4>Unknown Nodes</h4>
+          <h2>{unknownNodes}</h2>
+        </div>
+
+        <div className="stat-box">
+          <h4>Communication Range</h4>
+          <h2>{communicationRange} m</h2>
+        </div>
+
+        <div className="stat-box">
+          <h4>Communication Links</h4>
+          <h2>{connections.length}</h2>
+        </div>
+
       </div>
+
     </div>
   );
 }

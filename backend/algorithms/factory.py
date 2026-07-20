@@ -16,7 +16,13 @@ class AlgorithmFactory:
         max_iterations=100,
     ):
 
-        algorithm_name = algorithm_name.lower()
+        # Normalize algorithm name
+        algorithm_name = (
+            algorithm_name.strip()
+            .lower()
+            .replace("-", "_")
+            .replace(" ", "_")
+        )
 
         if algorithm_name == "mfo":
             return MFO(
@@ -49,4 +55,7 @@ class AlgorithmFactory:
             )
 
         else:
-            raise ValueError(f"Unknown algorithm: {algorithm_name}")
+            raise ValueError(
+                f"Unknown algorithm: '{algorithm_name}'. "
+                "Supported algorithms: mfo, ga, hybrid_mfo_ga."
+            )

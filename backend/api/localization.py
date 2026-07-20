@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+import time
 
 from algorithms.factory import AlgorithmFactory
 from analytics.evaluator import evaluate_localization
@@ -14,13 +15,11 @@ router = APIRouter(
 @router.post("/run")
 def run_localization(request: NetworkRequest):
 
-    # Generate the WSN
     network = generate_random_network(request)
 
     sensor_nodes = network["sensor_nodes"]
     anchor_nodes = network["anchor_nodes"]
 
-    # Ground-truth positions
     true_positions = {
         node["id"]: {
             "x": node["x"],
@@ -39,7 +38,11 @@ def run_localization(request: NetworkRequest):
         max_iterations=request.max_iterations,
     )
 
+    start_time = time.perf_counter()
+
     result = algorithm.run()
+
+    execution_time = time.perf_counter() - start_time
 
     estimated_positions = result["best_position"]
 
@@ -48,6 +51,8 @@ def run_localization(request: NetworkRequest):
         estimated_positions=estimated_positions,
         communication_range=request.communication_range,
     )
+
+    result["execution_time"] = round(execution_time, 4)
 
     return {
         "network": network,

@@ -85,3 +85,14 @@
 
     background:#1d4ed8;
 }
+.readonly-field {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 18px;
+    background: #f5f7fa;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}

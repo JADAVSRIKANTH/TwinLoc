@@ -2,6 +2,7 @@ import { useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { generateNetwork } from "../../services/networkService";
 import NetworkVisualization from "../../components/NetworkVisualization/NetworkVisualization";
+import { useNetwork } from "../../context/NetworkContext";
 import "./WSNGenerator.css";
 
 function WSNGenerator() {
@@ -12,48 +13,49 @@ function WSNGenerator() {
     anchorNodes: 20,
     radius: 25,
     deployment: "Random",
-    algorithm: "Hybrid MFO-GA",
+    algorithm: "hybrid_mfo_ga",
     seed: 12345,
   });
 
-  // Store generated network
-  const [network, setNetwork] = useState(null);
+  const { network, setNetwork } = useNetwork();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleGenerate = async () => {
-    try {
-      const response = await generateNetwork({
-        network_width: Number(formData.width),
-        network_height: Number(formData.height),
-        sensor_nodes: Number(formData.sensorNodes),
-        anchor_nodes: Number(formData.anchorNodes),
-        communication_range: Number(formData.radius),
-        deployment: formData.deployment,
-        algorithm: formData.algorithm,
-        seed: Number(formData.seed),
-      });
+      try {
+        const response = await generateNetwork({
+          network_width: Number(formData.width),
+          network_height: Number(formData.height),
+          sensor_nodes: Number(formData.sensorNodes),
+          anchor_nodes: Number(formData.anchorNodes),
+          communication_range: Number(formData.radius),
+          deployment: formData.deployment,
+          algorithm: formData.algorithm,
+          seed: Number(formData.seed),
+        });
 
-      // Save generated network
-      setNetwork(response);
+        const networkData = {
+          ...response,
+          deployment: formData.deployment,
+          algorithm: formData.algorithm,
+          seed: Number(formData.seed),
+        };
 
-      // Debugging (remove later if you want)
-      console.log("Generated Network:", response);
-      console.log("Sensor Nodes:", response.sensor_nodes);
-      console.log("Anchor Nodes:", response.anchor_nodes);
-      console.log("Statistics:", response.statistics);
+        setNetwork(networkData);
 
-      alert("Network Generated Successfully!");
-    } catch (error) {
-      console.error("Error generating network:", error);
-      alert("Failed to generate network.");
-    }
-  };
+        console.log("Network saved:", networkData);
+
+        alert("Network Generated Successfully!");
+      } catch (error) {
+        console.error("Error generating network:", error);
+        alert("Failed to generate network.");
+      }
+    };
 
   return (
     <div className="generator-page">
@@ -62,7 +64,9 @@ function WSNGenerator() {
       <main className="generator-content">
         <h1>WSN Generator</h1>
 
-        <p>Generate Wireless Sensor Networks for Localization Experiments</p>
+        <p>
+          Generate Wireless Sensor Networks for Localization Experiments
+        </p>
 
         <div className="generator-card">
           <h2>Network Parameters</h2>
@@ -113,9 +117,9 @@ function WSNGenerator() {
             value={formData.deployment}
             onChange={handleChange}
           >
-            <option>Random</option>
-            <option>Grid</option>
-            <option>Clustered</option>
+            <option value="Random">Random</option>
+            <option value="Grid">Grid</option>
+            <option value="Clustered">Clustered</option>
           </select>
 
           <label>Localization Algorithm</label>
@@ -124,7 +128,9 @@ function WSNGenerator() {
             value={formData.algorithm}
             onChange={handleChange}
           >
-            <option>Hybrid MFO-GA</option>
+            <option value="mfo">MFO</option>
+            <option value="ga">GA</option>
+            <option value="hybrid_mfo_ga">Hybrid MFO-GA</option>
           </select>
 
           <label>Random Seed</label>
@@ -139,6 +145,7 @@ function WSNGenerator() {
             Generate Network
           </button>
         </div>
+
         <NetworkVisualization network={network} />
       </main>
     </div>
