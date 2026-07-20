@@ -11,11 +11,9 @@ router = APIRouter(
     tags=["Localization"]
 )
 
-
-@router.post("/run")
-def run_localization(request: NetworkRequest):
-
-    network = generate_random_network(request)
+def execute_algorithm(request: NetworkRequest,algorithm_name: str,network=None,):
+    if network is None:
+        network = generate_random_network(request)
 
     sensor_nodes = network["sensor_nodes"]
     anchor_nodes = network["anchor_nodes"]
@@ -29,7 +27,7 @@ def run_localization(request: NetworkRequest):
     }
 
     algorithm = AlgorithmFactory.create_algorithm(
-        algorithm_name=request.algorithm,
+        algorithm_name=algorithm_name,
         sensor_nodes=sensor_nodes,
         anchor_nodes=anchor_nodes,
         communication_range=request.communication_range,
@@ -58,4 +56,44 @@ def run_localization(request: NetworkRequest):
         "network": network,
         "localization_result": result,
         "analytics": analytics,
+    }
+@router.post("/run")
+def run_localization(request: NetworkRequest):
+    return execute_algorithm(request, request.algorithm)
+@router.post("/compare")
+def compare_algorithms(request: NetworkRequest):
+
+    # Generate one common network
+    network = generate_random_network(request)
+
+    algorithms = [
+        ("MFO", "mfo"),
+        ("GA", "ga"),
+        ("Hybrid MFO-GA", "hybrid_mfo_ga"),
+    ]
+
+    results = []
+
+    for display_name, algorithm_name in algorithms:
+
+        result = execute_algorithm(
+            request=request,
+            algorithm_name=algorithm_name,
+            network=network,
+        )
+
+        results.append({
+            "algorithm": display_name,
+            "rmse": result["analytics"]["rmse"],
+            "mean_localization_error": result["analytics"]["mean_localization_error"],
+            "normalized_localization_error": result["analytics"]["normalized_localization_error"],
+            "execution_time": result["localization_result"]["execution_time"],
+            "success_rate": result["analytics"]["localization_success_rate"],
+            "localized_nodes": result["analytics"]["localized_nodes"],
+            "unlocalized_nodes": result["analytics"]["unlocalized_nodes"],
+        })
+
+    return {
+        "network": network,
+        "results": results,
     }
