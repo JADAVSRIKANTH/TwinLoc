@@ -884,3 +884,202 @@ body{
     }
 
 }
+/* ============================================================
+   Additional Styles for Analytics.jsx
+============================================================ */
+
+/* Summary Box */
+
+.summary-box {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+    line-height: 1.8;
+    color: #374151;
+    margin-top: 15px;
+}
+
+/* Recommendation Card */
+
+.recommendation-card {
+    background: #f8fafc;
+    border: 1px solid #dbeafe;
+    border-left: 5px solid #2563eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.recommendation-card h3 {
+    margin-bottom: 20px;
+    color: #1e40af;
+    font-size: 22px;
+}
+
+/* Recommendation Grid */
+
+.recommendation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+/* Recommendation Item */
+
+.recommendation-item {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+    transition: 0.25s;
+}
+
+.recommendation-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+.recommendation-item span {
+    display: block;
+    color: #6b7280;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.recommendation-item strong {
+    font-size: 20px;
+    color: #111827;
+}
+
+/* Research Insights */
+
+.insights-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.insights-card ul {
+    padding-left: 20px;
+    line-height: 1.9;
+}
+
+.insights-card li {
+    margin-bottom: 12px;
+}
+
+/* Chart Card */
+
+.chart-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.chart-card h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1f2937;
+}
+
+/* Section Header */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Compare Button */
+
+.compare-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.25s;
+}
+
+.compare-btn:hover {
+    background: #1d4ed8;
+}
+
+.compare-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* Comparison Table */
+
+.comparison-table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.comparison-table thead {
+    background: #2563eb;
+    color: white;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.comparison-table tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+.comparison-table tbody tr:hover {
+    background: #eff6ff;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .recommendation-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .compare-btn {
+        width: 100%;
+    }
+
+    .chart-card {
+        padding: 15px;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+        font-size: 13px;
+        padding: 10px;
+    }
+}

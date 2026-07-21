@@ -57,6 +57,9 @@ function Simulation() {
       });
 
       setSimulationResult(response);
+      console.log("Simulation Response:", response);
+      console.log("Analytics:", response.analytics);
+      console.log("Localization:", response.localization_result);
 
       console.log("Simulation Result:", response);
 
