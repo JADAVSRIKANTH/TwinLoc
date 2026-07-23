@@ -1,313 +1,1036 @@
 import { useState } from "react";
+
 import Sidebar from "../../components/Sidebar/Sidebar";
+import NetworkVisualization from "../../components/NetworkVisualization/NetworkVisualization";
+
 import { useNetwork } from "../../context/NetworkContext";
+
 import { runLocalization } from "../../services/localizationService";
+
 import "./Simulation.css";
 
 function Simulation() {
-  const {
-    network,
-    simulationResult,
-    setSimulationResult,
-  } = useNetwork();
 
-  // Algorithm comes from WSN Generator
-  const algorithm = network?.algorithm || "hybrid_mfo_ga";
+    /* ===========================================================
+       Context
+    =========================================================== */
 
-  const [iterations, setIterations] = useState(100);
-  const [population, setPopulation] = useState(30);
-  const [loading, setLoading] = useState(false);
+    const {
+        network,
+        simulationResult,
+        setSimulationResult,
+    } = useNetwork();
 
-  const getAlgorithmName = (algo) => {
-    switch (algo) {
-      case "mfo":
-        return "MFO";
+    /* ===========================================================
+       Simulation Configuration
+    =========================================================== */
 
-      case "ga":
-        return "GA";
+    const algorithm =
+        network?.algorithm || "hybrid_mfo_ga";
 
-      case "hybrid_mfo_ga":
-        return "Hybrid MFO-GA";
+    /* ===========================================================
+       State Variables
+    =========================================================== */
 
-      default:
-        return algo;
-    }
-  };
+    const [iterations, setIterations] =
+        useState(100);
 
-  const handleRunSimulation = async () => {
+    const [population, setPopulation] =
+        useState(30);
+
+    const [loading, setLoading] =
+        useState(false);
+
+    /* ===========================================================
+       Progress Tracking
+    =========================================================== */
+
+    const [progress, setProgress] =
+        useState(0);
+
+    const [currentStep, setCurrentStep] =
+        useState(0);
+
+    const [currentIteration, setCurrentIteration] =
+        useState(0);
+
+    /* ===========================================================
+       Simulation Log
+    =========================================================== */
+
+    const [simulationLogs, setSimulationLogs] =
+        useState([]);
+
+    /* ===========================================================
+       Simulation Timeline
+    =========================================================== */
+
+    const simulationSteps = [
+
+        "Generate Network",
+
+        "Initialize Population",
+
+        "Run Hybrid MFO-GA",
+
+        "Compute Fitness",
+
+        "Estimate Positions",
+
+        "Generate Analytics",
+
+        "Completed",
+
+    ];
+
+    /* ===========================================================
+       Helper Functions
+    =========================================================== */
+
+    const getAlgorithmName = (algo) => {
+
+        switch (algo) {
+
+            case "mfo":
+                return "MFO";
+
+            case "ga":
+                return "Genetic Algorithm";
+
+            case "hybrid_mfo_ga":
+                return "Hybrid MFO-GA";
+
+            default:
+                return algo;
+        }
+
+    };
+
+    const getDeploymentName = (deployment) => {
+
+        switch (deployment) {
+
+            case "random":
+                return "Random";
+
+            case "grid":
+                return "Grid";
+
+            case "circular":
+                return "Circular";
+
+            default:
+                return deployment;
+        }
+
+    };
+
+    /* ===========================================================
+       Simulation Logger
+    =========================================================== */
+
+    const addLog = (message) => {
+
+        const time =
+            new Date().toLocaleTimeString();
+
+        setSimulationLogs((previousLogs) => [
+
+            ...previousLogs,
+
+            `[${time}] ${message}`,
+
+        ]);
+
+    };
+
+    /* ===========================================================
+   Simulation Function
+=========================================================== */
+
+const handleRunSimulation = async () => {
+
     if (!network) {
-      alert("Please generate a network first.");
-      return;
+
+        alert("Please generate a network first.");
+
+        return;
+
     }
 
     try {
-      setLoading(true);
 
-      const response = await runLocalization({
-        network_width: network.network_width,
-        network_height: network.network_height,
-        sensor_nodes: network.sensor_nodes.length,
-        anchor_nodes: network.anchor_nodes.length,
-        communication_range: network.communication_range,
-        deployment: network.deployment,
-        algorithm: algorithm,
-        seed: network.seed,
-        max_iterations: iterations,
-        population_size: population,
-      });
+        setLoading(true);
 
-      setSimulationResult(response);
-      console.log("Simulation Response:", response);
-      console.log("Analytics:", response.analytics);
-      console.log("Localization:", response.localization_result);
+        setProgress(0);
 
-      console.log("Simulation Result:", response);
+        setCurrentIteration(0);
 
-      alert("Simulation completed successfully!");
-    } catch (error) {
-      console.error("Simulation Error:", error);
-      alert("Failed to run simulation.");
-    } finally {
-      setLoading(false);
+        setCurrentStep(0);
+
+        setSimulationLogs([]);
+
+        addLog("Simulation started.");
+
+        /* -------------------------------
+           Step 1
+        ------------------------------- */
+
+        setCurrentStep(1);
+
+        setProgress(10);
+
+        addLog("Initializing population.");
+
+        /* -------------------------------
+           Backend API
+        ------------------------------- */
+
+        const response = await runLocalization({
+
+            network_width: network.network_width,
+
+            network_height: network.network_height,
+
+            sensor_nodes: network.sensor_nodes.length,
+
+            anchor_nodes: network.anchor_nodes.length,
+
+            communication_range:
+                network.communication_range,
+
+            deployment: network.deployment,
+
+            algorithm: algorithm,
+
+            seed: network.seed,
+
+            max_iterations: iterations,
+
+            population_size: population,
+
+        });
+
+        /* -------------------------------
+           Step 2
+        ------------------------------- */
+
+        setCurrentStep(2);
+
+        setProgress(35);
+
+        addLog("Localization algorithm executed.");
+
+        /* -------------------------------
+           Step 3
+        ------------------------------- */
+
+        setCurrentStep(3);
+
+        setProgress(55);
+
+        addLog("Computing fitness values.");
+
+        /* -------------------------------
+           Step 4
+        ------------------------------- */
+
+        setCurrentStep(4);
+
+        setProgress(75);
+
+        addLog("Estimating node locations.");
+
+        /* -------------------------------
+           Save Result
+        ------------------------------- */
+
+        setSimulationResult(response);
+
+        /* -------------------------------
+           Step 5
+        ------------------------------- */
+
+        setCurrentStep(5);
+
+        setProgress(90);
+
+        addLog("Generating analytics.");
+
+        /* -------------------------------
+           Completed
+        ------------------------------- */
+
+        setCurrentStep(6);
+
+        setProgress(100);
+
+        setCurrentIteration(iterations);
+
+        addLog("Simulation completed successfully.");
+
+        console.log("Simulation Response :", response);
+
+        console.log("Analytics :", response.analytics);
+
+        console.log(
+            "Localization :",
+            response.localization_result
+        );
+
     }
-  };
 
-  return (
+    catch (error) {
+
+        console.error(error);
+
+        addLog("Simulation failed.");
+
+        alert("Failed to run simulation.");
+
+    }
+
+    finally {
+
+        setLoading(false);
+
+    }
+
+};
+
+/* ===========================================================
+   JSX Starts Here
+=========================================================== */
+
+return (
+
     <div className="simulation-page">
 
-      <Sidebar />
+        <Sidebar />
 
-      <main className="simulation-content">
+        <main className="simulation-content">
+                      {/* ===========================================================
+                Page Header
+            =========================================================== */}
 
-        <h1>Simulation</h1>
+            <div className="page-header">
 
-        <p>
-          Execute localization algorithms on the generated
-          Wireless Sensor Network.
-        </p>
-                {/* ================= Network Summary ================= */}
+                <h1>Simulation</h1>
 
-        {network ? (
-          <div className="network-summary">
-
-            <h2>Selected Network</h2>
-
-            <div className="summary-grid">
-
-              <div className="summary-item">
-                <strong>Network Size</strong>
                 <p>
-                  {network.network_width} × {network.network_height} m
+                    Execute Wireless Sensor Network localization
+                    algorithms and evaluate their performance using
+                    the Digital Twin environment.
                 </p>
-              </div>
-
-              <div className="summary-item">
-                <strong>Sensor Nodes</strong>
-                <p>{network.sensor_nodes.length}</p>
-              </div>
-
-              <div className="summary-item">
-                <strong>Anchor Nodes</strong>
-                <p>{network.anchor_nodes.length}</p>
-              </div>
-
-              <div className="summary-item">
-                <strong>Communication Range</strong>
-                <p>{network.communication_range} m</p>
-              </div>
-
-              <div className="summary-item">
-                <strong>Deployment</strong>
-                <p>{network.deployment}</p>
-              </div>
-
-              <div className="summary-item">
-                <strong>Localization Algorithm</strong>
-                <p>{getAlgorithmName(algorithm)}</p>
-              </div>
 
             </div>
 
-          </div>
-        ) : (
-          <div className="network-summary warning">
+            {/* ===========================================================
+                Network Summary
+            =========================================================== */}
 
-            <h2>No Network Generated</h2>
+            {network ? (
 
-            <p>
-              Please generate a Wireless Sensor Network before
-              running the simulation.
-            </p>
+                <div className="network-summary">
 
-          </div>
-        )}
+                    <h2>Selected Network Configuration</h2>
 
-        {/* ================= Simulation Parameters ================= */}
+                    <div className="summary-grid">
 
-        <div className="simulation-grid">
+                        <div className="summary-item">
 
-          {/* Left Panel */}
+                            <strong>Network Size</strong>
 
-          <div className="simulation-card">
+                            <p>
 
-            <h2>Simulation Parameters</h2>
+                                {network.network_width} ×{" "}
+                                {network.network_height} m
 
-            <label>Localization Algorithm</label>
+                            </p>
 
-            <div className="readonly-field">
-              {getAlgorithmName(algorithm)}
+                        </div>
+
+                        <div className="summary-item">
+
+                            <strong>Sensor Nodes</strong>
+
+                            <p>
+
+                                {network.sensor_nodes.length}
+
+                            </p>
+
+                        </div>
+
+                        <div className="summary-item">
+
+                            <strong>Anchor Nodes</strong>
+
+                            <p>
+
+                                {network.anchor_nodes.length}
+
+                            </p>
+
+                        </div>
+
+                        <div className="summary-item">
+
+                            <strong>Communication Range</strong>
+
+                            <p>
+
+                                {network.communication_range} m
+
+                            </p>
+
+                        </div>
+
+                        <div className="summary-item">
+
+                            <strong>Deployment</strong>
+
+                            <p>
+
+                                {getDeploymentName(
+                                    network.deployment
+                                )}
+
+                            </p>
+
+                        </div>
+
+                        <div className="summary-item">
+
+                            <strong>Localization Algorithm</strong>
+
+                            <p>
+
+                                {getAlgorithmName(
+                                    algorithm
+                                )}
+
+                            </p>
+
+                        </div>
+
+                        <div className="summary-item">
+
+                            <strong>Maximum Iterations</strong>
+
+                            <p>
+
+                                {iterations}
+
+                            </p>
+
+                        </div>
+
+                        <div className="summary-item">
+
+                            <strong>Population Size</strong>
+
+                            <p>
+
+                                {population}
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            ) : (
+
+                <div className="network-summary warning">
+
+                    <h2>No Network Generated</h2>
+
+                    <p>
+
+                        Please generate a Wireless Sensor
+                        Network before running the
+                        localization simulation.
+
+                    </p>
+
+                </div>
+
+            )}
+
+            {/* ===========================================================
+                Simulation Grid
+            =========================================================== */}
+
+            <div className="simulation-grid">
+                              {/* ===========================================================
+                    Left Panel - Simulation Control Panel
+                =========================================================== */}
+
+                <div className="simulation-card">
+
+                    <h2>Simulation Control Panel</h2>
+
+                    {/* ================= Algorithm ================= */}
+
+                    <div className="control-section">
+
+                        <label>Localization Algorithm</label>
+
+                        <div className="readonly-field">
+
+                            {getAlgorithmName(algorithm)}
+
+                        </div>
+
+                    </div>
+
+                    {/* ================= Iterations ================= */}
+
+                    <div className="control-section">
+
+                        <label>Maximum Iterations</label>
+
+                        <input
+                            type="number"
+                            min="10"
+                            max="1000"
+                            value={iterations}
+                            onChange={(e) =>
+                                setIterations(Number(e.target.value))
+                            }
+                        />
+
+                    </div>
+
+                    {/* ================= Population ================= */}
+
+                    <div className="control-section">
+
+                        <label>Population Size</label>
+
+                        <input
+                            type="number"
+                            min="10"
+                            max="500"
+                            value={population}
+                            onChange={(e) =>
+                                setPopulation(Number(e.target.value))
+                            }
+                        />
+
+                    </div>
+
+                    {/* ================= Progress ================= */}
+
+                    <div className="progress-card">
+
+                        <div className="progress-header">
+
+                            <span>Simulation Progress</span>
+
+                            <span>{progress}%</span>
+
+                        </div>
+
+                        <div className="progress-bar">
+
+                            <div
+                                className={`progress-fill ${
+                                    loading
+                                        ? "progress-running"
+                                        : progress === 100
+                                        ? "progress-complete"
+                                        : ""
+                                }`}
+                                style={{
+                                    width: `${progress}%`,
+                                }}
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    {/* ================= Information ================= */}
+
+                    <div className="simulation-info">
+
+                        <div className="info-row">
+
+                            <span>Status</span>
+
+                            <strong>
+
+                                {loading
+                                    ? "Running"
+                                    : simulationResult
+                                    ? "Completed"
+                                    : "Ready"}
+
+                            </strong>
+
+                        </div>
+
+                        <div className="info-row">
+
+                            <span>Current Step</span>
+
+                            <strong>
+
+                                {simulationSteps[currentStep] ||
+                                    "Waiting"}
+
+                            </strong>
+
+                        </div>
+
+                        <div className="info-row">
+
+                            <span>Iterations</span>
+
+                            <strong>
+
+                                {currentIteration} / {iterations}
+
+                            </strong>
+
+                        </div>
+
+                        <div className="info-row">
+
+                            <span>Deployment</span>
+
+                            <strong>
+
+                                {network
+                                    ? getDeploymentName(
+                                          network.deployment
+                                      )
+                                    : "--"}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    {/* ================= Run Button ================= */}
+
+                    <button
+                        className="run-btn"
+                        onClick={handleRunSimulation}
+                        disabled={!network || loading}
+                    >
+
+                        {loading
+                            ? "Running Simulation..."
+                            : "Run Simulation"}
+
+                    </button>
+
+                </div>
+
+                {/* ===========================================================
+                    Right Panel Starts Here
+                              {/* ===========================================================
+                    Right Panel - Live Statistics
+                =========================================================== */}
+
+                <div className="simulation-card">
+
+                    <h2>Live Statistics Dashboard</h2>
+
+                    <div className="live-stats-grid">
+
+                        {/* ================= Status ================= */}
+
+                        <div className="live-card">
+
+                            <h4>Simulation Status</h4>
+
+                            <p
+                                className={`status ${
+                                    loading
+                                        ? "running"
+                                        : simulationResult
+                                        ? "completed"
+                                        : "ready"
+                                }`}
+                            >
+
+                                {loading
+                                    ? "Running"
+                                    : simulationResult
+                                    ? "Completed"
+                                    : "Ready"}
+
+                            </p>
+
+                        </div>
+
+                        {/* ================= RMSE ================= */}
+
+                        <div className="live-card">
+
+                            <h4>RMSE</h4>
+
+                            <h2>
+
+                                {simulationResult
+                                    ? Number(
+                                          simulationResult.analytics.rmse
+                                      ).toFixed(2)
+                                    : "--"}
+
+                            </h2>
+
+                        </div>
+
+                        {/* ================= Mean Localization Error ================= */}
+
+                        <div className="live-card">
+
+                            <h4>Mean Localization Error</h4>
+
+                            <h2>
+
+                                {simulationResult
+                                    ? Number(
+                                          simulationResult.analytics
+                                              .mean_localization_error
+                                      ).toFixed(2)
+                                    : "--"}
+
+                            </h2>
+
+                        </div>
+
+                        {/* ================= Normalized Error ================= */}
+
+                        <div className="live-card">
+
+                            <h4>Normalized Error</h4>
+
+                            <h2>
+
+                                {simulationResult
+                                    ? Number(
+                                          simulationResult.analytics
+                                              .normalized_localization_error
+                                      ).toFixed(2)
+                                    : "--"}
+
+                            </h2>
+
+                        </div>
+
+                        {/* ================= Success Rate ================= */}
+
+                        <div className="live-card">
+
+                            <h4>Success Rate</h4>
+
+                            <h2>
+
+                                {simulationResult
+                                    ? `${Number(
+                                          simulationResult.analytics
+                                              .localization_success_rate
+                                      ).toFixed(2)} %`
+                                    : "--"}
+
+                            </h2>
+
+                        </div>
+
+                        {/* ================= Localized Nodes ================= */}
+
+                        <div className="live-card">
+
+                            <h4>Localized Nodes</h4>
+
+                            <h2>
+
+                                {simulationResult
+                                    ? simulationResult.analytics
+                                          .localized_nodes
+                                    : "--"}
+
+                            </h2>
+
+                        </div>
+
+                        {/* ================= Unlocalized Nodes ================= */}
+
+                        <div className="live-card">
+
+                            <h4>Unlocalized Nodes</h4>
+
+                            <h2>
+
+                                {simulationResult
+                                    ? simulationResult.analytics
+                                          .unlocalized_nodes
+                                    : "--"}
+
+                            </h2>
+
+                        </div>
+
+                        {/* ================= Execution Time ================= */}
+
+                        <div className="live-card">
+
+                            <h4>Execution Time</h4>
+
+                            <h2>
+
+                                {simulationResult
+                                    ? `${Number(
+                                          simulationResult
+                                              .localization_result
+                                              .execution_time
+                                      ).toFixed(2)} s`
+                                    : "--"}
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <label>Maximum Iterations</label>
+            {/* ===========================================================
+                Network Visualization Starts Here
+                (PART 6)
+            =========================================================== */}
+                        {/* ===========================================================
+                Network Visualization
+            =========================================================== */}
 
-            <input
-              type="number"
-              min="1"
-              value={iterations}
-              onChange={(e) =>
-                setIterations(Number(e.target.value))
-              }
-            />
+            {network && (
 
-            <label>Population Size</label>
+                <div className="simulation-card">
 
-            <input
-              type="number"
-              min="1"
-              value={population}
-              onChange={(e) =>
-                setPopulation(Number(e.target.value))
-              }
-            />
+                    <h2>Wireless Sensor Network Visualization</h2>
 
-            <button
-              onClick={handleRunSimulation}
-              disabled={!network || loading}
-            >
-              {loading
-                ? "Running Simulation..."
-                : "Run Simulation"}
-            </button>
+                    <p className="section-description">
+                        Visual representation of the generated
+                        Wireless Sensor Network showing anchor
+                        nodes, sensor nodes, and communication
+                        links.
+                    </p>
 
-          </div>
+                    <NetworkVisualization
+                        network={network}
+                    />
 
-          {/* Right Panel Starts Here */}
-                    {/* ================= Right Panel ================= */}
+                </div>
 
-          <div className="simulation-card">
+            )}
 
-            <h2>Simulation Status</h2>
+            {/* ===========================================================
+                Simulation Timeline
+            =========================================================== */}
 
-            <p
-              className={`status ${
-                loading
-                  ? "running"
-                  : simulationResult
-                  ? "completed"
-                  : "ready"
-              }`}
-            >
-              {loading
-                ? "Running..."
-                : simulationResult
-                ? "Completed"
-                : "Ready"}
-            </p>
+            <div className="simulation-card">
 
-            <h2>Performance Metrics</h2>
+                <h2>Simulation Timeline</h2>
 
-            <div className="metrics">
+                <p className="section-description">
+                    Current progress of the localization process.
+                </p>
 
-              <div className="metric">
-                <span>RMSE</span>
-                <strong>
-                  {simulationResult
-                    ? Number(
-                        simulationResult.analytics.rmse
-                      ).toFixed(2)
-                    : "--"}
-                </strong>
-              </div>
+                <div className="timeline">
 
-              <div className="metric">
-                <span>Mean Localization Error</span>
-                <strong>
-                  {simulationResult
-                    ? Number(
-                        simulationResult.analytics
-                          .mean_localization_error
-                      ).toFixed(2)
-                    : "--"}
-                </strong>
-              </div>
+                    {simulationSteps.map((step, index) => (
 
-              <div className="metric">
-                <span>Normalized Localization Error</span>
-                <strong>
-                  {simulationResult
-                    ? Number(
-                        simulationResult.analytics
-                          .normalized_localization_error
-                      ).toFixed(2)
-                    : "--"}
-                </strong>
-              </div>
+                        <div
+                            key={step}
+                            className={`timeline-step ${
+                                index < currentStep
+                                    ? "completed"
+                                    : index === currentStep
+                                    ? "active"
+                                    : ""
+                            }`}
+                        >
 
-              <div className="metric">
-                <span>Localization Success Rate</span>
-                <strong>
-                  {simulationResult
-                    ? `${Number(
-                        simulationResult.analytics
-                          .localization_success_rate
-                      ).toFixed(2)} %`
-                    : "--"}
-                </strong>
-              </div>
+                            <div className="timeline-circle">
 
-              <div className="metric">
-                <span>Localized Nodes</span>
-                <strong>
-                  {simulationResult
-                    ? simulationResult.analytics
-                        .localized_nodes
-                    : "--"}
-                </strong>
-              </div>
+                                {index < currentStep
+                                    ? "✓"
+                                    : index + 1}
 
-              <div className="metric">
-                <span>Unlocalized Nodes</span>
-                <strong>
-                  {simulationResult
-                    ? simulationResult.analytics
-                        .unlocalized_nodes
-                    : "--"}
-                </strong>
-              </div>
+                            </div>
 
-              <div className="metric">
-                <span>Execution Time</span>
-                <strong>
-                  {simulationResult
-                    ? `${Number(
-                        simulationResult
-                          .localization_result
-                          .execution_time
-                      ).toFixed(2)} sec`
-                    : "--"}
-                </strong>
-              </div>
+                            <div className="timeline-content">
+
+                                <h4>{step}</h4>
+
+                                <p>
+
+                                    {index < currentStep
+                                        ? "Completed"
+                                        : index === currentStep
+                                        ? "In Progress"
+                                        : "Waiting"}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    ))}
+
+                </div>
 
             </div>
 
-          </div>
+            {/* ===========================================================
+                Simulation Log Starts Here
+                (PART 7)
+            =========================================================== */}
+                        {/* ===========================================================
+                Simulation Log
+            =========================================================== */}
 
-        </div>
+            <div className="simulation-card">
 
-      </main>
+                <h2>Simulation Log</h2>
+
+                <p className="section-description">
+                    Real-time events generated during the localization
+                    process.
+                </p>
+
+                <div className="simulation-log">
+
+                    {simulationLogs.length > 0 ? (
+
+                        simulationLogs.map((log, index) => (
+
+                            <div
+                                key={index}
+                                className="log-entry"
+                            >
+                                {log}
+                            </div>
+
+                        ))
+
+                    ) : (
+
+                        <div className="log-placeholder">
+
+                            No simulation has been executed yet.
+
+                        </div>
+
+                    )}
+
+                </div>
+
+            </div>
+
+            {/* ===========================================================
+                Research Notes
+            =========================================================== */}
+
+            <div className="simulation-card">
+
+                <h2>Research Notes</h2>
+
+                <div className="research-notes">
+
+                    <div className="note-item">
+
+                        <strong>Algorithm</strong>
+
+                        <p>
+
+                            {getAlgorithmName(algorithm)}
+
+                        </p>
+
+                    </div>
+
+                    <div className="note-item">
+
+                        <strong>Deployment</strong>
+
+                        <p>
+
+                            {network
+                                ? getDeploymentName(
+                                      network.deployment
+                                  )
+                                : "--"}
+
+                        </p>
+
+                    </div>
+
+                    <div className="note-item">
+
+                        <strong>Simulation Status</strong>
+
+                        <p>
+
+                            {loading
+                                ? "Running"
+                                : simulationResult
+                                ? "Completed"
+                                : "Waiting"}
+
+                        </p>
+
+                    </div>
+
+                    <div className="note-item">
+
+                        <strong>Generated By</strong>
+
+                        <p>
+
+                            TwinLoc Digital Twin Platform
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {/* ===========================================================
+                Footer
+            =========================================================== */}
+
+            <footer className="simulation-footer">
+
+                <p>
+
+                    TwinLoc • Digital Twin Based Wireless Sensor
+                    Network Localization Platform
+
+                </p>
+
+            </footer>
+
+        </main>
 
     </div>
-  );
+
+);
+
 }
 
 export default Simulation;

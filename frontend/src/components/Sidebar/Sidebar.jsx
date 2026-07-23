@@ -46,7 +46,12 @@ function Sidebar() {
       <FaFileAlt /> Reports
     </Link>
   </li>
-
+  <li>
+    <Link to="/algorithm-visualizer">
+        <i className="fas fa-project-diagram"></i>
+        <span>Algorithm Visualizer</span>
+    </Link>
+</li>
   <li>
     <Link to="/settings">
       <FaCog /> Settings
